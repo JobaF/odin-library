@@ -9,8 +9,25 @@ function Book(title, author, category, publishDate, pageCount, imageLink) {
   this.imageLink = imageLink
 }
 
-const addBookToLibrary = () => {
-  // do stuff here
+const addBookToLibrary = async () => {
+  const inputField = document.querySelector('.inputField')
+  const valueInputField = inputField.value
+  inputField.value = ''
+
+  let bookData = await fetchBooks(valueInputField)
+  bookData = bookData
+    .filter((book) => book.volumeInfo.categories)
+    .filter((book) => book.volumeInfo.imageLinks)
+
+  addBookFromApiData(bookData[0])
+  console.log(myLibrary)
+  resetBooksAndRerender()
+}
+
+const resetBooksAndRerender = () => {
+  const container = document.querySelector('.container')
+  container.innerHTML = ''
+  createHTMLElements()
 }
 
 const fetchBooks = async (keyword) => {
@@ -20,6 +37,30 @@ const fetchBooks = async (keyword) => {
   const json = await result.json()
 
   return json.items
+}
+
+const addBookFromApiData = (book) => {
+  const {
+    authors,
+    categories,
+    pageCount,
+    imageLinks,
+    publishedDate,
+    title,
+  } = book.volumeInfo
+
+  if (categories == null || imageLinks == null) return
+
+  myLibrary.push(
+    new Book(
+      title,
+      authors[0],
+      categories[0],
+      publishedDate,
+      pageCount,
+      imageLinks['thumbnail'],
+    ),
+  )
 }
 
 const createBooksFromApiData = (apiData) => {
@@ -89,10 +130,7 @@ const main = async () => {
 
 const handleDelete = (title) => {
   myLibrary = myLibrary.filter((book) => book.title !== title)
-
-  const container = document.querySelector('.container')
-  container.innerHTML = ''
-  createHTMLElements()
+  resetBooksAndRerender()
 }
 
 main()
