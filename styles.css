@@ -30,3 +30,9 @@ p {
   position: absolute;
   right: 0;
 }
+
+.input {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
